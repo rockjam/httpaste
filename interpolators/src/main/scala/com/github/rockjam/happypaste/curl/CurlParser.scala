@@ -57,6 +57,21 @@ object CurlParser {
     (headerPrefixes ~ (singleQuotedHeader | doubleQuotedHeader)).map(HttpHeader.tupled)
   }
 
+// don't interpret @
+  val data = {
+    val dataPrefixes = {
+      val `-d`     = P("-d")
+      val `--data` = P("--data")
+      (`-d` ~ ws) | (`--data` ~ " ".rep(min = 1))
+    }
+    def quotedData(q: Char) = s"$q" ~ CharsWhile(_ != q).! ~ s"$q"
+
+    val singleQuotedData = quotedData(''')
+    val doubleQuotedData = quotedData('"')
+
+    (dataPrefixes ~ (singleQuotedData | doubleQuotedData)).map(Data)
+  }
+
 //  val Parsed.Success(_, _)    = header.parse("-H 'Content-Type: application/json'")
 //  val Parsed.Success(_, _)    = header.parse("-H'Content-Type: application/json'")
 //  val Parsed.Failure(_, _, _) = header.parse("--header'Content-Type: application/json'")
@@ -76,12 +91,14 @@ object CurlParser {
   val naiveUri = CharsWhile(_ != ' ').!.map(URI)
 
   val command: Parser[HttpRequestBlueprint, Char, String] = {
-    val parser = (curl ~ ws) ~ ((methods ~ ws) | (header ~ ws) | (location ~ ws) | (naiveUri ~ ws)).rep
+    val curlParameters = (methods ~ ws) | (header ~ ws) | (location ~ ws) | (data ~ ws) | (naiveUri ~ ws)
+    val parser         = (curl ~ ws) ~ curlParameters.rep
     parser.map { parts =>
       (parts foldLeft HttpRequestBlueprint.empty) { (req, part) =>
         part match {
           case uri: URI           => req.copy(uri = uri)
           case method: HttpMethod => req.copy(method = method)
+          case data: Data         => req.copy(data = Some(data))
           case FollowRedirect     => req.copy(followRedirect = true)
           case header: HttpHeader => req.copy(headers = req.headers :+ header)
         }

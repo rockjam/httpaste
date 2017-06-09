@@ -11,20 +11,35 @@ object Main extends App {
   val request2 = curl"""curl -L -XGET -H 'Content-Type: application/json' https://google.com """
   val request3 = curl"""curl https://google.com -L -XGET -H 'Content-Type: application/json'"""
 
+  val requestWithData =
+    curl"""curl -XPOST
+          -H "Content-Type: application/json"
+          --data '{ "name": "rockjam", "old": false }'
+          http://example.com/users"""
+
   println(request1)
   println(request2)
   println(request3)
+  println(requestWithData)
 
   def asScalajHttp(blueprint: HttpRequestBlueprint): HttpRequest = {
     val options =
       if (blueprint.followRedirect) Seq(HttpOptions.followRedirects(true)) else Seq.empty
 
-    Http(blueprint.uri.value)
+    val prepared = Http(blueprint.uri.value)
       .method(blueprint.method.name)
       .headers(blueprint.headers.map(e => e.name -> e.value))
       .options(options)
+
+    blueprint.data map { data =>
+      prepared.copy(connectFunc = StringBodyConnectFunc(data.value))
+    } getOrElse prepared
   }
 
-  println(asScalajHttp(request1).asString)
+  val scalajRequest = asScalajHttp(requestWithData)
+  println(scalajRequest)
+  val response = scalajRequest.execute()
+  println(response.code)
+  println(response.body)
 
 }
