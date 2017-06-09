@@ -75,10 +75,10 @@ object CurlParser {
 
   val naiveUri = CharsWhile(_ != ' ').!.map(URI)
 
-  val command: Parser[HttpRequest, Char, String] = {
+  val command: Parser[HttpRequestBlueprint, Char, String] = {
     val parser = (curl ~ ws) ~ ((methods ~ ws) | (header ~ ws) | (location ~ ws) | (naiveUri ~ ws)).rep
     parser.map { parts =>
-      (parts foldLeft HttpRequest.empty) { (req, part) =>
+      (parts foldLeft HttpRequestBlueprint.empty) { (req, part) =>
         part match {
           case uri: URI           => req.copy(uri = uri)
           case method: HttpMethod => req.copy(method = method)

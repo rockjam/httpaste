@@ -20,13 +20,13 @@ final case class HttpHeader(name: String, value: String) extends RequestPart
 
 case object FollowRedirect extends RequestPart
 
-final case class URI(uri: String) extends RequestPart
+final case class URI(value: String) extends RequestPart
 
-object HttpRequest {
-  val empty: HttpRequest = HttpRequest(HttpMethod.GET, URI(""), Seq.empty, false)
+object HttpRequestBlueprint {
+  val empty: HttpRequestBlueprint = HttpRequestBlueprint(HttpMethod.GET, URI(""), Seq.empty, false)
 }
 
-final case class HttpRequest(method: HttpMethod,
-                             uri: URI,
-                             headers: Seq[HttpHeader],
-                             followRedirect: Boolean)
+final case class HttpRequestBlueprint(method: HttpMethod,
+                                      uri: URI,
+                                      headers: Seq[HttpHeader],
+                                      followRedirect: Boolean)
