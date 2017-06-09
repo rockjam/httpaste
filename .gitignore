@@ -6,3 +6,4 @@ project/plugins/project/
 project/target
 logs/
 .DS_STORE
+.idea
