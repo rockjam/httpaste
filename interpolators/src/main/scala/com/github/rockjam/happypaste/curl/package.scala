@@ -1,5 +1,6 @@
 package com.github.rockjam.happypaste
 
+import com.github.rockjam.happypaste.model.HttpRequestBlueprint
 import fastparse.core.Parsed
 
 package object curl {

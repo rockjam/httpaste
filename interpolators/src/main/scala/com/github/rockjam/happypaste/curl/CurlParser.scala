@@ -1,5 +1,6 @@
 package com.github.rockjam.happypaste.curl
 
+import com.github.rockjam.happypaste.model._
 import fastparse.all._
 import fastparse.core.Parser
 
@@ -10,16 +11,10 @@ object CurlParser {
   val ws = " ".rep
 
   val methods = {
-    val requestPrefixes = {
-      val minusX            = P("-X")
-      val minusMinusRequest = P("--request")
-      (minusX ~ ws) | (minusMinusRequest ~ ws)
-    }
-
-    val get  = requestPrefixes ~ "GET".!
-    val post = requestPrefixes ~ "POST".!
-    val put  = requestPrefixes ~ "PUT".!
-    (get | post | put).map(HttpMethod.fromString)
+    val get  = "GET"
+    val post = "POST"
+    val put  = "PUT"
+    (get | post | put).!.map(HttpMethod.fromString)
   }
 
 //  val Parsed.Success(_, _) = methods.parse("--request GET")
@@ -54,7 +49,7 @@ object CurlParser {
     val singleQuotedHeader = quotedHeader(''')
     val doubleQuotedHeader = quotedHeader('"')
 
-    (headerPrefixes ~ (singleQuotedHeader | doubleQuotedHeader)).map(HttpHeader.tupled)
+    (headerPrefixes ~ (singleQuotedHeader | doubleQuotedHeader)).map(HttpHeader.apply)
   }
 
 // don't interpret @
