@@ -11,10 +11,16 @@ object CurlParser {
   val ws = " ".rep
 
   val methods = {
-    val get  = "GET"
-    val post = "POST"
-    val put  = "PUT"
-    (get | post | put).!.map(HttpMethod.fromString)
+    val requestPrefixes = {
+      val minusX            = P("-X")
+      val minusMinusRequest = P("--request")
+      (minusX ~ ws) | (minusMinusRequest ~ ws)
+    }
+
+    val get  = requestPrefixes ~ "GET".!
+    val post = requestPrefixes ~ "POST".!
+    val put  = requestPrefixes ~ "PUT".!
+    (get | post | put).map(HttpMethod.fromString)
   }
 
 //  val Parsed.Success(_, _) = methods.parse("--request GET")
@@ -87,7 +93,7 @@ object CurlParser {
 
   val command: Parser[HttpRequestBlueprint, Char, String] = {
     val curlParameters = (methods ~ ws) | (header ~ ws) | (location ~ ws) | (data ~ ws) | (naiveUri ~ ws)
-    val parser         = (curl ~ ws) ~ curlParameters.rep
+    val parser         = (curl ~ ws) ~ curlParameters.rep(min = 1)
     parser.map { parts =>
       (parts foldLeft HttpRequestBlueprint.empty) { (req, part) =>
         part match {

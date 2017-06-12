@@ -16,6 +16,7 @@ object Main extends App {
   val requestWithData =
     curl"""curl -XPOST
           -H "Content-Type: application/json"
+          -H "Accept-Language: ru,en-US;q=0.8,en;q=0.6"
           --data '{ "name": "rockjam", "old": false }'
           http://example.com/users"""
 
@@ -58,6 +59,8 @@ object Main extends App {
       prepared.copy(connectFunc = StringBodyConnectFunc(data.value))
     } getOrElse prepared
   }
+
+  val malformed = curl"curl "
 
   val scalajRequest = asScalajHttp(requestWithData)
   println(scalajRequest)
