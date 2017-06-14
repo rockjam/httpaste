@@ -1,4 +1,5 @@
 package com.github.rockjam.happypaste.model
+import scala.collection.immutable
 
 sealed trait RequestPart extends Product with Serializable
 
@@ -24,6 +25,17 @@ object HttpMethod {
   case object DELETE  extends HttpMethod("DELETE")
   case object TRACE   extends HttpMethod("TRACE")
   case object CONNECT extends HttpMethod("CONNECT")
+
+  val all: immutable.Seq[HttpMethod] = List(
+    OPTIONS,
+    GET,
+    HEAD,
+    POST,
+    PUT,
+    DELETE,
+    TRACE,
+    CONNECT
+  )
 }
 
 object HttpHeader {
@@ -38,6 +50,8 @@ final case class Data(value: String) extends RequestPart // it's actually sequen
 case object FollowRedirect extends RequestPart
 
 final case class UnknownFlag(value: String) extends RequestPart
+
+case object Ingorable extends RequestPart // TODO: find ways to remove it
 
 final case class URI(value: String) extends RequestPart
 
