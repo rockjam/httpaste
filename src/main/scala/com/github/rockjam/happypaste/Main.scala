@@ -48,7 +48,7 @@ object Main extends App {
 
   def asScalajHttp(blueprint: HttpRequestBlueprint): HttpRequest = {
     val options =
-      if (blueprint.followRedirect) Seq(HttpOptions.followRedirects(true)) else Seq.empty
+      if (blueprint.options.followRedirect) Seq(HttpOptions.followRedirects(true)) else Seq.empty
 
     val prepared = Http(blueprint.uri.value)
       .method(blueprint.method.name)

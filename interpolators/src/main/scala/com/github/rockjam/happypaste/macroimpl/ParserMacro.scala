@@ -26,7 +26,7 @@ object ParserMacro {
 
     result match {
       case Parsed.Success(value, _) =>
-        val HttpRequestBlueprint(method, uri, headers, follow, optData) = value
+        val HttpRequestBlueprint(method, uri, headers, options, optData) = value
         val res = {
           val headerTrees = headers.map { h =>
             q"HttpHeader(${h.name}, ${h.value})"
@@ -44,7 +44,7 @@ object ParserMacro {
                 method = $methodTree,
                 uri = $uriTree,
                 headers = _root_.scala.Seq(..$headerTrees),
-                followRedirect = $follow,
+                options = RequestOptions(${options.followRedirect}),
                 data = $dataTree
               )
          """)

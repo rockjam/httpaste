@@ -40,7 +40,7 @@ object RequestMessageParser {
         HttpRequestBlueprint(method,
                              uri,
                              headers,
-                             followRedirect = false,
+                             options = RequestOptions.empty,
                              data = optMessage.map(lines => Data(lines.mkString)))
     }
 }

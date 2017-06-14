@@ -79,7 +79,7 @@ object CurlParser {
           case uri: URI           => req.copy(uri = uri)
           case method: HttpMethod => req.copy(method = method)
           case data: Data         => req.copy(data = Some(data))
-          case FollowRedirect     => req.copy(followRedirect = true)
+          case FollowRedirect     => req.copy(options = req.options.copy(followRedirect = true))
           case header: HttpHeader => req.copy(headers = req.headers :+ header)
           case unknown: UnknownFlag =>
             println(s"Got unknown flag: ${unknown}")

@@ -1,4 +1,5 @@
 package com.github.rockjam.happypaste.model
+
 import scala.collection.immutable
 
 sealed trait RequestPart extends Product with Serializable
@@ -57,12 +58,21 @@ final case class URI(value: String) extends RequestPart
 
 object HttpRequestBlueprint {
   val empty: HttpRequestBlueprint =
-    HttpRequestBlueprint(HttpMethod.GET, URI(""), Seq.empty, followRedirect = false, data = None)
+    HttpRequestBlueprint(method = HttpMethod.GET,
+                         uri = URI(""),
+                         headers = Seq.empty,
+                         options = RequestOptions.empty,
+                         data = None)
 }
+
+object RequestOptions {
+  val empty = RequestOptions(followRedirect = false)
+}
+case class RequestOptions(followRedirect: Boolean)
 
 final case class HttpRequestBlueprint(
     method: HttpMethod,
     uri: URI, // TODO: validate uri; add http/https if not present
     headers: Seq[HttpHeader],
-    followRedirect: Boolean, // ??? should it be there, or move to options?
+    options: RequestOptions, // ??? should it be there, or move to options?
     data: Option[Data]) // requestEntity/entity ???
