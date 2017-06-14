@@ -37,6 +37,8 @@ final case class Data(value: String) extends RequestPart // it's actually sequen
 
 case object FollowRedirect extends RequestPart
 
+final case class UnknownFlag(value: String) extends RequestPart
+
 final case class URI(value: String) extends RequestPart
 
 object HttpRequestBlueprint {

@@ -11,7 +11,7 @@ import scala.reflect.macros.blackbox.Context
 object ParserMacro {
 
   def curlImpl(c: Context)(): c.Expr[HttpRequestBlueprint] =
-    macroImpl(c, "curl", CurlParser.command)
+    macroImpl(c, "curl", CurlParser.commandParser)
 
   def httpImpl(c: Context)(): c.Expr[HttpRequestBlueprint] =
     macroImpl(c, "http", RequestMessageParser.requestMessage)
