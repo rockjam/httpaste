@@ -1,6 +1,7 @@
 package com.github.rockjam.happypaste.curl
 
 import com.github.rockjam.happypaste.model._
+import com.github.rockjam.happypaste.parsing.UriParser
 import fastparse.all._
 
 object CurlParser {
@@ -64,14 +65,14 @@ object CurlParser {
 
   val unknownFlags = ("--" ~ CharsWhile(_ != ' ')).!.map(UnknownFlag)
 
-  val naiveUri = CharsWhile(_ != ' ').!.map(URI)
+  val uri = (UriParser.parser | "'" ~ UriParser.parser ~ "'" | "\"" ~ UriParser.parser ~ "\"")
 
   val backSlash = P("\\").map(_ => Ingorable) // TODO: find a ways to get rid of ignorable
 
   val newLine = P("\n").map(_ => Ingorable) // TODO: find a ways to get rid of ignorable
 
   val commandParser: Parser[HttpRequestBlueprint] = {
-    val commandParameters = (method | header | location | data | unknownFlags | backSlash | newLine | naiveUri) ~ ws
+    val commandParameters = (method | header | location | data | unknownFlags | backSlash | newLine | uri) ~ ws
     val parser            = curl ~ ws ~ commandParameters.rep(min = 1)
     parser.map { parts =>
       (parts foldLeft HttpRequestBlueprint.empty) { (req, part) =>
@@ -84,6 +85,11 @@ object CurlParser {
           case unknown: UnknownFlag =>
             println(s"Got unknown flag: ${unknown}")
             req
+          case newURI: NewURI =>
+            val scheme   = newURI.scheme.getOrElse("http")
+            val query    = newURI.query.map("?" + _).getOrElse("")
+            val fragment = newURI.fragment.map("#" + _).getOrElse("")
+            req.copy(uri = URI(s"${scheme}://${newURI.authority}${query}${fragment}"))
           case Ingorable => req
         }
       }

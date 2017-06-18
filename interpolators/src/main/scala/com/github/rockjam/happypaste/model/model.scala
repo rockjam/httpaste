@@ -56,6 +56,12 @@ case object Ingorable extends RequestPart // TODO: find ways to remove it
 
 final case class URI(value: String) extends RequestPart
 
+final case class NewURI(scheme: Option[String],
+                        authority: String, // it's both authority and path for now.
+                        query: Option[String],
+                        fragment: Option[String])
+    extends RequestPart
+
 object HttpRequestBlueprint {
   val empty: HttpRequestBlueprint =
     HttpRequestBlueprint(method = HttpMethod.GET,

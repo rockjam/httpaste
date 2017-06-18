@@ -72,6 +72,10 @@ object Main extends App {
           -H 'If-Modified-Since: Tue, 13 Jun 2017 20:36:57 GMT' \
           -H 'Cache-Control: max-age=0'"""
 
+  val github = curl"curl -L -XGET api.github.com/rate_limit"
+  println(github)
+  println(asScalajHttp(github).asString)
+
 // won't compile
 //  val malformedCurl = curl"curl "
 //
