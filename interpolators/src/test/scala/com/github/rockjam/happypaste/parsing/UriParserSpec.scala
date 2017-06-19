@@ -61,6 +61,19 @@ class UriParserSpec extends FlatSpec with Matchers with Inspectors {
     )
   }
 
+  it should "parse uri with - in path" in {
+    val uri = expectSuccess(
+      parser.parse(
+        "http://docs.scala-lang.org/overviews/reflection/annotations-names-scopes.html"))
+
+    uri shouldEqual NewURI(
+      scheme = Some("http"),
+      authority = "docs.scala-lang.org/overviews/reflection/annotations-names-scopes.html",
+      query = None,
+      fragment = None
+    )
+  }
+
   it should "parse valid uri's" in {
     val validUri = List(
       "http://foo.com/blah_blah",

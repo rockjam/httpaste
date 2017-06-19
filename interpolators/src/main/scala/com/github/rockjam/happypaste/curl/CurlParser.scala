@@ -8,7 +8,7 @@ object CurlParser {
 
   val curl = P("curl")
 
-  val ws = " ".rep
+  val ws = P(" ".rep)
 
   val method = {
     val requestPrefixes = {
@@ -65,14 +65,14 @@ object CurlParser {
 
   val unknownFlags = ("--" ~ CharsWhile(_ != ' ')).!.map(UnknownFlag)
 
-  val uri = (UriParser.parser | "'" ~ UriParser.parser ~ "'" | "\"" ~ UriParser.parser ~ "\"")
+  val uri = P(UriParser.parser | "'" ~ UriParser.parser ~ "'" | "\"" ~ UriParser.parser ~ "\"")
 
   val backSlash = P("\\").map(_ => Ingorable) // TODO: find a ways to get rid of ignorable
 
   val newLine = P("\n").map(_ => Ingorable) // TODO: find a ways to get rid of ignorable
 
   val commandParser: Parser[HttpRequestBlueprint] = {
-    val commandParameters = (method | header | location | data | unknownFlags | backSlash | newLine | uri) ~ ws
+    val commandParameters = (method | header | location | data | uri | unknownFlags | backSlash | newLine) ~ ws
     val parser            = curl ~ ws ~ commandParameters.rep(min = 1)
     parser.map { parts =>
       (parts foldLeft HttpRequestBlueprint.empty) { (req, part) =>
