@@ -1,13 +1,12 @@
 package com.github.rockjam.happypaste
 
 import com.github.rockjam.happypaste
-import com.github.rockjam.happypaste.parsing.HttpRequestBlueprint
 
 object Main extends App {
 
   import happypaste.curl._
   import happypaste.http._
-  import scalaj.http._
+  import happypaste.scalajhttp._
 
   val request1 = curl"""curl -L -XGET -H 'Content-Type: application/json' https://google.com"""
   val request2 = curl"""curl -L -XGET -H 'Content-Type: application/json' https://google.com """
@@ -41,27 +40,18 @@ object Main extends App {
       page_id=a24d9e31620af10761693
       """
 
-  println(s"http request: ${httpRequest}")
-  println(asScalajHttp(httpRequest))
-  println(asScalajHttp(httpRequest).asString)
-
-  def asScalajHttp(blueprint: HttpRequestBlueprint): HttpRequest = {
-    val options =
-      if (blueprint.options.followRedirect) Seq(HttpOptions.followRedirects(true)) else Seq.empty
-
-    val prepared = Http(blueprint.uri.value)
-      .method(blueprint.method.name)
-      .headers(blueprint.headers.map(e => e.name -> e.value))
-      .options(options)
-
-    blueprint.data map { data =>
-      prepared.copy(connectFunc = StringBodyConnectFunc(data.value))
-    } getOrElse prepared
+  {
+    println(s"http request: ${httpRequest}")
+    val request = httpRequest.asScalajHttp
+    println(request)
+    println(request.asString)
   }
 
-  val github = curl"curl -L -XGET api.github.com/rate_limit"
-  println(github)
-  println(asScalajHttp(github).asString)
+  {
+    val github = curl"curl -L -XGET api.github.com/rate_limit"
+    println(github)
+    println(github.asScalajHttp)
+  }
 
 // won't compile
 //  val malformedCurl = curl"curl "
@@ -83,7 +73,7 @@ object Main extends App {
 //      page_id=a24d9e31620af10761693
 //      """
 
-  val scalajRequest = asScalajHttp(requestWithData)
+  val scalajRequest = requestWithData.asScalajHttp
   println(scalajRequest)
   val response = scalajRequest.execute()
   println(response.code)
