@@ -6,7 +6,10 @@ lazy val root = project
   .settings(commonSettings)
   .settings(noPublish)
   .settings(
-    libraryDependencies += "org.scalaj" %% "scalaj-http" % "2.3.0"
+    libraryDependencies ++= Seq(
+      "org.scalaj" %% "scalaj-http" % "2.3.0",
+      "com.typesafe.akka" %% "akka-http" % "10.0.8"
+    )
   )
   .dependsOn(interpolators)
   .aggregate(interpolators)

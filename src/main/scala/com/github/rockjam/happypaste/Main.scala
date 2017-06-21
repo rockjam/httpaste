@@ -1,12 +1,14 @@
 package com.github.rockjam.happypaste
 
-import com.github.rockjam.happypaste
+import akka.actor.ActorSystem
+import akka.http.scaladsl.Http
+import akka.stream.ActorMaterializer
+
+import scala.concurrent.Await
 
 object Main extends App {
 
-  import happypaste.curl._
-  import happypaste.http._
-  import happypaste.scalajhttp._
+  import curl._, http._, scalajhttp._, akkahttp._
 
   val request1 = curl"""curl -L -XGET -H 'Content-Type: application/json' https://google.com"""
   val request2 = curl"""curl -L -XGET -H 'Content-Type: application/json' https://google.com """
@@ -48,9 +50,34 @@ object Main extends App {
   }
 
   {
-    val github = curl"curl -L -XGET api.github.com/rate_limit"
-    println(github)
-    println(github.asScalajHttp)
+    val github  = curl"curl -L -XGET api.github.com/rate_limit"
+    val request = github.asScalajHttp
+    println(request)
+    println(s"=== from scalaj: ${request.asString}")
+  }
+
+  {
+    // akka http doesn't handle follow redirect thing
+    val github  = curl"curl -L -XGET https://api.github.com/rate_limit"
+    val request = github.asAkkaHttp
+    println(s"=== akka request: ${request}")
+
+    implicit val system = ActorSystem("requests")
+    implicit val mat    = ActorMaterializer()
+    import system.dispatcher
+    val http = Http(system)
+
+    val response = for {
+      resp <- http.singleRequest(request)
+      _ = println(resp.headers)
+      _ = println(resp.status)
+      body <- resp.entity.dataBytes.runFold("")(_ + _.utf8String)
+    } yield body
+
+    import scala.concurrent.duration._
+    val result = Await.result(response, 10.seconds)
+
+    println(s"==== from akka http: ${result}")
   }
 
 // won't compile
