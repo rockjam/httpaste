@@ -1,4 +1,4 @@
-package com.github.rockjam.happypaste.model
+package com.github.rockjam.happypaste.parsing
 
 import scala.collection.immutable
 

@@ -1,7 +1,6 @@
 package com.github.rockjam.happypaste.curl
 
-import com.github.rockjam.happypaste.model._
-import com.github.rockjam.happypaste.parsing.UriParser
+import com.github.rockjam.happypaste.parsing._
 import fastparse.all._
 
 object CurlParser {
@@ -45,16 +44,17 @@ object CurlParser {
 // don't interpret @
   val data = {
     val dataPrefixes = {
-      val `-d`     = P("-d")
-      val `--data` = P("--data")
-      (`-d` ~ ws) | (`--data` ~ " ".rep(min = 1))
+      val `-d`            = P("-d")
+      val `--data`        = P("--data")
+      val `--data-binary` = P("--data-binary")
+      (`-d` ~ ws) | (`--data-binary` ~ " ".rep(min = 1)) | (`--data` ~ " ".rep(min = 1))
     }
     def quotedData(q: Char) = s"$q" ~ CharsWhile(_ != q).! ~ s"$q"
 
     val singleQuotedData = quotedData(''')
     val doubleQuotedData = quotedData('"')
 
-    (dataPrefixes ~ (singleQuotedData | doubleQuotedData)).map(Data)
+    (dataPrefixes ~ "$".? ~ (singleQuotedData | doubleQuotedData)).map(Data)
   }
 
   val location = {
@@ -72,8 +72,8 @@ object CurlParser {
   val newLine = P("\n").map(_ => Ingorable) // TODO: find a ways to get rid of ignorable
 
   val commandParser: Parser[HttpRequestBlueprint] = {
-    val commandParameters = (method | header | location | data | uri | unknownFlags | backSlash | newLine) ~ ws
-    val parser            = curl ~ ws ~ commandParameters.rep(min = 1)
+    val commandParameters = method | header | location | data | unknownFlags | backSlash | newLine | uri
+    val parser            = curl ~ ws ~ commandParameters.rep(min = 1, sep = ws)
     parser.map { parts =>
       (parts foldLeft HttpRequestBlueprint.empty) { (req, part) =>
         part match {

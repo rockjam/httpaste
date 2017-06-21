@@ -1,6 +1,5 @@
 package com.github.rockjam.happypaste.parsing
 
-import com.github.rockjam.happypaste.model.NewURI
 import fastparse.all.Parsed
 import org.scalactic.source.Position
 import org.scalatest.{FlatSpec, Inspectors, Matchers}

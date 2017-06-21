@@ -1,6 +1,6 @@
 package com.github.rockjam.happypaste.http
 
-import com.github.rockjam.happypaste.model._
+import com.github.rockjam.happypaste.parsing._
 import fastparse.all._
 
 object RequestMessageParser {
@@ -20,7 +20,7 @@ object RequestMessageParser {
         "TRACE" |
         "CONNECT"
     ).!.map(HttpMethod.fromString)
-    val requestUri  = CharsWhile(_ != ' ').!.map(URI)
+    val requestUri  = CharsWhile(_ != ' ').!.map(URI) // TODO: use UriParser instead
     val httpVersion = ("HTTP/1.0" | "HTTP/1.1" | "HTTP/2").!
 
     method ~ SP ~ requestUri ~ SP ~ httpVersion ~ CRLF

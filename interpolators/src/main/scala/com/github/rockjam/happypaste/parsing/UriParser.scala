@@ -1,6 +1,5 @@
 package com.github.rockjam.happypaste.parsing
 
-import com.github.rockjam.happypaste.model.NewURI
 import fastparse.all._
 
 object UriParser {

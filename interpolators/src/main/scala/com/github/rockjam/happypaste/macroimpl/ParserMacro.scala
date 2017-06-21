@@ -2,7 +2,7 @@ package com.github.rockjam.happypaste.macroimpl
 
 import com.github.rockjam.happypaste.curl.CurlParser
 import com.github.rockjam.happypaste.http.RequestMessageParser
-import com.github.rockjam.happypaste.model.HttpRequestBlueprint
+import com.github.rockjam.happypaste.parsing.HttpRequestBlueprint
 import fastparse.all.Parser
 import fastparse.core.Parsed
 
