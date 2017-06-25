@@ -12,6 +12,7 @@ lazy val root = project
   )
   .aggregate(
     `httpaste-akkahttp`,
+    `httpaste-core`,
     `httpaste-curl`,
     `httpaste-scalajhttp`
   )

@@ -1,4 +1,4 @@
-package com.github.rockjam.happypaste
+package com.github.rockjam.httpaste
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
@@ -8,7 +8,6 @@ import scala.concurrent.Await
 
 object Main extends App {
 
-  import com.github.rockjam.httpaste._
   import curl._, scalajhttp._, akkahttp._
 
   val request1 = curl"""curl -L -XGET -H 'Content-Type: application/json' https://google.com"""
