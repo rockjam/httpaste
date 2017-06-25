@@ -8,7 +8,8 @@ import scala.concurrent.Await
 
 object Main extends App {
 
-  import curl._, http._, scalajhttp._, akkahttp._
+  import com.github.rockjam.httpaste._
+  import curl._, scalajhttp._, akkahttp._
 
   val request1 = curl"""curl -L -XGET -H 'Content-Type: application/json' https://google.com"""
   val request2 = curl"""curl -L -XGET -H 'Content-Type: application/json' https://google.com """
@@ -24,30 +25,6 @@ object Main extends App {
   println(request1)
   println(request2)
   println(request3)
-
-  val httpRequest =
-    http"""POST https://edit.telegra.ph/check HTTP/1.1
-      Host: edit.telegra.ph
-      Connection: keep-alive
-      Content-Length: 29
-      Accept: application/json, text/javascript, */*; q=0.01
-      Origin: http://telegra.ph
-      User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36
-      Content-Type: application/x-www-form-urlencoded; charset=UTF-8
-      Referer: http://telegra.ph/Test-these-cookies-12-04
-      Accept-Encoding: gzip, deflate, br
-      Accept-Language: ru,en-US;q=0.8,en;q=0.6
-      Cookie: tph_uuid=w5WBtTKUzjlO30mzcWmqvCQgxOEfXzurEo05hIZO1i
-
-      page_id=a24d9e31620af10761693
-      """
-
-  {
-    println(s"http request: ${httpRequest}")
-    val request = httpRequest.asScalajHttp
-    println(request)
-    println(request.asString)
-  }
 
   {
     val github  = curl"curl -L -XGET api.github.com/rate_limit"

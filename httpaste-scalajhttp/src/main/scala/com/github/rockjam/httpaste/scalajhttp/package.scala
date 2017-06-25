@@ -1,8 +1,6 @@
-package com.github.rockjam.happypaste
+package com.github.rockjam.httpaste
 
-import com.github.rockjam.happypaste.parsing.HttpRequestBlueprint
-
-import scalaj.http.{Http, HttpOptions, HttpRequest, StringBodyConnectFunc}
+import scalaj.http._
 
 package object scalajhttp {
 

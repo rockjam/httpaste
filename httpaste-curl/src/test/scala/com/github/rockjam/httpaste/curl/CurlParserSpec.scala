@@ -1,4 +1,4 @@
-package com.github.rockjam.happypaste.curl
+package com.github.rockjam.httpaste.curl
 
 import fastparse.all.Parsed
 import org.scalatest.{FlatSpec, Inspectors, Matchers}

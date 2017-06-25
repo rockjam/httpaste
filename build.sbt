@@ -2,27 +2,44 @@ version in ThisBuild := "0.0.1-SNAPSHOT"
 
 lazy val root = project
   .in(file("."))
-  .settings(name := "happypaste")
+  .settings(name := "httpaste")
   .settings(commonSettings)
   .settings(noPublish)
-  .settings(
-    libraryDependencies ++= Seq(
-      "org.scalaj" %% "scalaj-http" % "2.3.0",
-      "com.typesafe.akka" %% "akka-http" % "10.0.8"
-    )
+  .dependsOn(
+    `httpaste-akkahttp`,
+    `httpaste-curl`,
+    `httpaste-scalajhttp`
   )
-  .dependsOn(interpolators)
-  .aggregate(interpolators)
+  .aggregate(
+    `httpaste-akkahttp`,
+    `httpaste-curl`,
+    `httpaste-scalajhttp`
+  )
 
+lazy val `httpaste-curl` = project
+    .settings(commonSettings)
+    .settings(libraryDependencies ++= Seq(
+      "com.lihaoyi" %% "fastparse" % "0.4.3",
+      "org.scala-lang" % "scala-reflect" % "2.12.2",
+      "org.scalatest" %% "scalatest" % "3.0.3" % Test
+    ))
+    .dependsOn(`httpaste-core`)
 
-lazy val interpolators = project
+lazy val `httpaste-scalajhttp` = project
+    .settings(commonSettings)
+    .settings(libraryDependencies ++= Seq(
+      "org.scalaj" %% "scalaj-http" % "2.3.0"
+    ))
+    .dependsOn(`httpaste-core`)
+
+lazy val `httpaste-akkahttp` = project
   .settings(commonSettings)
   .settings(libraryDependencies ++= Seq(
-    "org.scalaj" %% "scalaj-http" % "2.3.0",
-    "com.lihaoyi" %% "fastparse" % "0.4.3",
-    "org.scala-lang" % "scala-reflect" % "2.12.2",
-    "org.scalatest" %% "scalatest" % "3.0.3" % Test
+    "com.typesafe.akka" %% "akka-http" % "10.0.8"
   ))
+  .dependsOn(`httpaste-core`)
+
+lazy val `httpaste-core` = project.settings(commonSettings)
 
 lazy val commonSettings = Seq(
   organization := "com.github.rockjam",
@@ -51,3 +68,12 @@ lazy val noPublish = Seq(
   publishLocal := {},
   publishArtifact := false
 )
+
+//lazy val interpolators = project
+//  .settings(commonSettings)
+//  .settings(libraryDependencies ++= Seq(
+//    "org.scalaj" %% "scalaj-http" % "2.3.0",
+//    "com.lihaoyi" %% "fastparse" % "0.4.3",
+//    "org.scala-lang" % "scala-reflect" % "2.12.2",
+//    "org.scalatest" %% "scalatest" % "3.0.3" % Test
+//  ))

@@ -1,6 +1,5 @@
 package com.github.rockjam.happypaste.macroimpl
 
-import com.github.rockjam.happypaste.curl.CurlParser
 import com.github.rockjam.happypaste.http.RequestMessageParser
 import com.github.rockjam.happypaste.parsing.HttpRequestBlueprint
 import fastparse.all.Parser
@@ -10,8 +9,8 @@ import scala.reflect.macros.blackbox.Context
 
 object ParserMacro {
 
-  def curlImpl(c: Context)(): c.Expr[HttpRequestBlueprint] =
-    macroImpl(c, "curl", CurlParser.commandParser)
+//  def curlImpl(c: Context)(): c.Expr[HttpRequestBlueprint] =
+//    macroImpl(c, "curl", CurlParser.commandParser)
 
   def httpImpl(c: Context)(): c.Expr[HttpRequestBlueprint] =
     macroImpl(c, "http", RequestMessageParser.requestMessage)

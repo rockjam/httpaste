@@ -1,4 +1,4 @@
-package com.github.rockjam.happypaste.parsing
+package com.github.rockjam.httpaste.parsing
 
 import fastparse.all.Parsed
 import org.scalactic.source.Position
@@ -11,7 +11,7 @@ class UriParserSpec extends FlatSpec with Matchers with Inspectors {
 
   it should "parse uri with scheme and authority" in {
     val uri = expectSuccess(parser.parse("https://github.com"))
-    uri shouldEqual NewURI(
+    uri shouldEqual URI(
       scheme = Some("https"),
       authority = "github.com",
       query = None,
@@ -21,7 +21,7 @@ class UriParserSpec extends FlatSpec with Matchers with Inspectors {
 
   it should "not fail when scheme is not provided" in {
     val uri = expectSuccess(parser.parse("github.com"))
-    uri shouldEqual NewURI(
+    uri shouldEqual URI(
       scheme = None,
       authority = "github.com",
       query = None,
@@ -31,7 +31,7 @@ class UriParserSpec extends FlatSpec with Matchers with Inspectors {
 
   it should "parse uri with scheme and authority and path" in {
     val uri = expectSuccess(parser.parse("https://github.com/rockjam/metaservices"))
-    uri shouldEqual NewURI(
+    uri shouldEqual URI(
       scheme = Some("https"),
       authority = "github.com/rockjam/metaservices",
       query = None,
@@ -41,7 +41,7 @@ class UriParserSpec extends FlatSpec with Matchers with Inspectors {
 
   it should "parse uri with scheme and authority and path and query" in {
     val uri = expectSuccess(parser.parse("https://github.com/rockjam/metaservices?utf8=%E2%9C%93"))
-    uri shouldEqual NewURI(
+    uri shouldEqual URI(
       scheme = Some("https"),
       authority = "github.com/rockjam/metaservices",
       query = Some("utf8=%E2%9C%93"),
@@ -52,7 +52,7 @@ class UriParserSpec extends FlatSpec with Matchers with Inspectors {
   it should "parse uri with scheme and authority and path and query and fragment " in {
     val uri =
       expectSuccess(parser.parse("https://github.com/rockjam/metaservices?utf8=%E2%9C%93#usage"))
-    uri shouldEqual NewURI(
+    uri shouldEqual URI(
       scheme = Some("https"),
       authority = "github.com/rockjam/metaservices",
       query = Some("utf8=%E2%9C%93"),
@@ -65,7 +65,7 @@ class UriParserSpec extends FlatSpec with Matchers with Inspectors {
       parser.parse(
         "http://docs.scala-lang.org/overviews/reflection/annotations-names-scopes.html"))
 
-    uri shouldEqual NewURI(
+    uri shouldEqual URI(
       scheme = Some("http"),
       authority = "docs.scala-lang.org/overviews/reflection/annotations-names-scopes.html",
       query = None,

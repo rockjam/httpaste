@@ -1,6 +1,6 @@
-package com.github.rockjam.happypaste.curl
+package com.github.rockjam.httpaste.curl
 
-import com.github.rockjam.happypaste.parsing._
+import com.github.rockjam.httpaste._
 import org.scalatest.{FlatSpec, Matchers}
 
 class CurlInterpolatorSpec extends FlatSpec with Matchers {
@@ -10,9 +10,9 @@ class CurlInterpolatorSpec extends FlatSpec with Matchers {
   it should "parse simplest command and imply GET method" in {
     val req = curl"curl http://httpbin.org/get"
 
-    req.uri shouldEqual URI("http://httpbin.org/get")
+    req.uri.value shouldEqual "http://httpbin.org/get"
     req.data shouldBe empty
-    req.method shouldEqual HttpMethod.GET
+    req.method shouldEqual HttpMethod("GET")
     req.headers shouldBe empty
     req.options shouldBe RequestOptions.empty
   }
@@ -20,27 +20,27 @@ class CurlInterpolatorSpec extends FlatSpec with Matchers {
   it should "work with quoted uri" in {
     val req = curl"curl 'http://httpbin.org/get'"
 
-    req.uri shouldEqual URI("http://httpbin.org/get")
+    req.uri.value shouldEqual "http://httpbin.org/get"
   }
 
   it should "work with double-quoted uri" in {
     val req = curl"""curl "http://httpbin.org/get""""
 
-    req.uri shouldEqual URI("http://httpbin.org/get")
+    req.uri.value shouldEqual "http://httpbin.org/get"
   }
 
   it should "work when uri doesn't have scheme and imply http" in {
     val req = curl"curl httpbin.org/get"
 
-    req.uri shouldEqual URI("http://httpbin.org/get")
+    req.uri.value shouldEqual "http://httpbin.org/get"
   }
 
   it should "parse command with method provided" in {
     val req = curl"curl -XGET http://httpbin.org/get"
 
-    req.uri shouldEqual URI("http://httpbin.org/get")
+    req.uri.value shouldEqual "http://httpbin.org/get"
     req.data shouldBe empty
-    req.method shouldEqual HttpMethod.GET
+    req.method shouldEqual HttpMethod("GET")
     req.headers shouldBe empty
     req.options shouldBe RequestOptions.empty
   }
@@ -49,9 +49,9 @@ class CurlInterpolatorSpec extends FlatSpec with Matchers {
     val req =
       curl"curl -XGET -H 'Accept-Language: en-US' -H 'Referer: http://httpbin.org/' http://httpbin.org/get"
 
-    req.uri shouldEqual URI("http://httpbin.org/get")
+    req.uri.value shouldEqual "http://httpbin.org/get"
     req.data shouldBe empty
-    req.method shouldEqual HttpMethod.GET
+    req.method shouldEqual HttpMethod("GET")
     val expectedHeaders = Seq(
       HttpHeader("Accept-Language", "en-US"),
       HttpHeader("Referer", "http://httpbin.org/")
@@ -68,9 +68,9 @@ class CurlInterpolatorSpec extends FlatSpec with Matchers {
           --data '{ "name": "rockjam", "old": false }'
           http://httpbin.org/post"""
 
-    request.uri shouldEqual URI("http://httpbin.org/post")
+    request.uri.value shouldEqual "http://httpbin.org/post"
     request.data shouldEqual Some(Data("""{ "name": "rockjam", "old": false }"""))
-    request.method shouldEqual HttpMethod.POST
+    request.method shouldEqual HttpMethod("POST")
     request.options shouldEqual RequestOptions.empty
     val expectedHeaders = Seq(
       HttpHeader("Content-Type", "application/json"),
@@ -94,10 +94,9 @@ class CurlInterpolatorSpec extends FlatSpec with Matchers {
           -H 'If-Modified-Since: Tue, 13 Jun 2017 20:36:57 GMT' \
           -H 'Cache-Control: max-age=0'"""
 
-    request.uri shouldEqual URI(
-      "http://docs.scala-lang.org/overviews/reflection/annotations-names-scopes.html")
+    request.uri.value shouldEqual "http://docs.scala-lang.org/overviews/reflection/annotations-names-scopes.html"
     request.data shouldBe empty
-    request.method shouldEqual HttpMethod.GET
+    request.method shouldEqual HttpMethod("GET")
     request.options shouldEqual RequestOptions.empty
     val expectedHeaders = Seq(
       HttpHeader("Accept-Encoding", "gzip, deflate, sdch"),

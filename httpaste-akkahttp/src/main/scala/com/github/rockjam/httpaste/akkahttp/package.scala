@@ -1,8 +1,7 @@
-package com.github.rockjam.happypaste
+package com.github.rockjam.httpaste
 
 import akka.http.scaladsl.model.HttpHeader.ParsingResult
-import akka.http.scaladsl.model._
-import com.github.rockjam.happypaste.parsing.HttpRequestBlueprint
+import akka.http.scaladsl.model.{HttpMethod => AkkaHttpMethod, HttpHeader => AkkaHttpHeader, _}
 
 package object akkahttp {
 
@@ -16,10 +15,10 @@ package object akkahttp {
         .getOrElse(HttpEntity.Empty)
 
       HttpRequest(
-        method = HttpMethod.custom(blueprint.method.name),
+        method = AkkaHttpMethod.custom(blueprint.method.name),
         uri = Uri(blueprint.uri.value),
         headers = blueprint.headers.map { header =>
-          val ParsingResult.Ok(result, _) = HttpHeader.parse(header.name, header.value)
+          val ParsingResult.Ok(result, _) = AkkaHttpHeader.parse(header.name, header.value)
           result
         }.toVector,
         entity = entity
