@@ -19,6 +19,7 @@ lazy val root = project
 
 lazy val `httpaste-curl` = project
     .settings(commonSettings)
+    .settings(publishSettings)
     .settings(libraryDependencies ++= Seq(
       "com.lihaoyi" %% "fastparse" % "0.4.3",
       "org.scala-lang" % "scala-reflect" % "2.12.2",
@@ -28,6 +29,7 @@ lazy val `httpaste-curl` = project
 
 lazy val `httpaste-scalajhttp` = project
     .settings(commonSettings)
+    .settings(publishSettings)
     .settings(libraryDependencies ++= Seq(
       "org.scalaj" %% "scalaj-http" % "2.3.0"
     ))
@@ -35,12 +37,15 @@ lazy val `httpaste-scalajhttp` = project
 
 lazy val `httpaste-akkahttp` = project
   .settings(commonSettings)
+  .settings(publishSettings)
   .settings(libraryDependencies ++= Seq(
     "com.typesafe.akka" %% "akka-http" % "10.0.8"
   ))
   .dependsOn(`httpaste-core`)
 
-lazy val `httpaste-core` = project.settings(commonSettings)
+lazy val `httpaste-core` = project
+  .settings(commonSettings)
+  .settings(publishSettings)
 
 lazy val commonSettings = Seq(
   organization := "com.github.rockjam",
@@ -62,6 +67,10 @@ lazy val commonSettings = Seq(
     "-Xfuture"
   ),
   (scalacOptions in(Compile, console)) := scalacOptions.value.filterNot(_ == "-Xfatal-warnings")
+)
+
+lazy val publishSettings = Seq(
+  licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0"))
 )
 
 lazy val noPublish = Seq(
