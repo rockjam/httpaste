@@ -68,12 +68,3 @@ lazy val noPublish = Seq(
   publishLocal := {},
   publishArtifact := false
 )
-
-//lazy val interpolators = project
-//  .settings(commonSettings)
-//  .settings(libraryDependencies ++= Seq(
-//    "org.scalaj" %% "scalaj-http" % "2.3.0",
-//    "com.lihaoyi" %% "fastparse" % "0.4.3",
-//    "org.scala-lang" % "scala-reflect" % "2.12.2",
-//    "org.scalatest" %% "scalatest" % "3.0.3" % Test
-//  ))
