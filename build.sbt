@@ -70,6 +70,7 @@ lazy val commonSettings = Seq(
 )
 
 lazy val publishSettings = Seq(
+  homepage := Some(url("https://github.com/rockjam/httpaste")),
   licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0")),
   scmInfo := Some(
     ScmInfo(
