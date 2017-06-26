@@ -70,7 +70,21 @@ lazy val commonSettings = Seq(
 )
 
 lazy val publishSettings = Seq(
-  licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0"))
+  licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0")),
+  scmInfo := Some(
+    ScmInfo(
+      url("https://github.com/rockjam/httpaste"),
+      "scm:git@github.com:rockjam/httpaste.git"
+    )
+  ),
+  developers := List(
+    Developer(
+      "rockjam",
+      "Nikolay Tatarinov",
+      "5min4eq.unity@gmail.com",
+      url("https://github.com/rockjam")
+    )
+  )
 )
 
 lazy val noPublish = Seq(
