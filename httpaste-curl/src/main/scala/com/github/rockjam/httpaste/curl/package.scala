@@ -1,14 +1,38 @@
 package com.github.rockjam.httpaste
 
+import com.github.rockjam.httpaste.parsing.{ParsingException, RequestPart}
 import fastparse.core.Parsed
 
 package object curl {
 
   implicit class CurlStringContext(val ctx: StringContext) extends AnyVal {
-    def curl(): HttpRequestBlueprint =
-      CurlParser.commandParser.parse(ctx.parts.mkString) match {
+    def curl(): HttpRequestBlueprint = {
+      val inputString = ctx.parts.mkString
+      CurlParser.commandParser.parse(inputString) match {
         case Parsed.Success(parts, _) =>
-          (parts foldLeft HttpRequestBlueprint.empty) { (req, part) =>
+          toModel(parts) match {
+            case Left(err)        => throw new RuntimeException(err)
+            case Right(blueprint) => blueprint
+          }
+        case fail @ Parsed.Failure(lastParser, index, extra) =>
+          throw ParsingException(inputString, index, lastParser.toString)
+      }
+    }
+
+    private def toModel(parts: Seq[RequestPart]): Either[String, HttpRequestBlueprint] = {
+      val requestURI = parts
+        .collectFirst {
+          case uri: parsing.URI =>
+            URI(
+              scheme = uri.scheme,
+              authority = uri.authority,
+              query = uri.query,
+              fragment = uri.fragment
+            )
+        }
+      requestURI match {
+        case Some(uri) =>
+          val blueprint = (parts foldLeft HttpRequestBlueprint.default(uri)) { (req, part) =>
             part match {
               case method: parsing.HttpMethod =>
                 req.copy(method = HttpMethod(method.name))
@@ -22,18 +46,15 @@ package object curl {
                 println(s"Got unknown flag: ${unknown}")
                 req
               case uri: parsing.URI =>
-                req.copy(
-                  uri = URI(
-                    scheme = uri.scheme,
-                    authority = uri.authority,
-                    query = uri.query,
-                    fragment = uri.fragment
-                  ))
+                req
               case parsing.Ingorable => req
             }
           }
-        case Parsed.Failure(_, _, _) => throw new RuntimeException("Failed to parse curl request")
+          Right(blueprint)
+        case None =>
+          Left("URI is required in command!")
       }
+    }
   }
 
 }

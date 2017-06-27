@@ -1,6 +1,7 @@
 package com.github.rockjam.httpaste.curl
 
 import com.github.rockjam.httpaste._
+import com.github.rockjam.httpaste.parsing.ParsingException
 import org.scalatest.{FlatSpec, Matchers}
 
 class CurlInterpolatorSpec extends FlatSpec with Matchers {
@@ -119,8 +120,173 @@ class CurlInterpolatorSpec extends FlatSpec with Matchers {
     request.headers should contain theSameElementsAs expectedHeaders
   }
 
+  it should "fail with error when there is no URI in curl command" in {
+    val err = intercept[RuntimeException] {
+      curl"curl -XGET -H 'Accept-Language: en-US' -H 'Referer: http://httpbin.org/'"
+    }
+    err.getMessage shouldEqual "URI is required in command!"
+  }
+
+  it should "fail with parsing error when method is not valid" in {
+    val methodParser = "request method"
+
+    {
+      val err = intercept[ParsingException] {
+        curl"curl -XFOO"
+      }
+      err.index shouldEqual 5
+      err.lastParser shouldEqual methodParser
+    }
+
+    {
+      val err = intercept[ParsingException] {
+        curl"curl http://httpbin.org/get -XFOO"
+      }
+      err.index shouldEqual 28
+      err.lastParser shouldEqual methodParser
+    }
+
+    {
+      val err = intercept[ParsingException] {
+        curl"curl http://httpbin.org/get -X FOO -H 'Content-Type: application/json'"
+      }
+      err.index shouldEqual 28
+      err.lastParser shouldEqual methodParser
+    }
+
+    {
+      val err = intercept[ParsingException] {
+        curl"curl http://httpbin.org/get -X GE"
+      }
+      err.index shouldEqual 28
+      err.lastParser shouldEqual methodParser
+    }
+
+    {
+      val err = intercept[ParsingException] {
+        curl"curl --request FOO"
+      }
+      err.index shouldEqual 5
+      err.lastParser shouldEqual methodParser
+    }
+
+    {
+      val err = intercept[ParsingException] {
+        curl"curl http://httpbin.org/get --request FOO -H 'Content-Type: application/json'"
+      }
+      err.index shouldEqual 28
+      err.lastParser shouldEqual methodParser
+    }
+
+    {
+      val err = intercept[ParsingException] {
+        curl"curl http://httpbin.org/get --request GE"
+      }
+      err.index shouldEqual 28
+      err.lastParser shouldEqual methodParser
+    }
+
+    {
+      val err = intercept[ParsingException] {
+        curl"""curl http://httpbin.org/get --request GE"""
+      }
+      err.index shouldEqual 28
+      err.lastParser shouldEqual methodParser
+    }
+
+  }
+
+  it should "fail with parsing error when headers are not valid" in {
+    val headerParser = "http header"
+
+    {
+      val err = intercept[ParsingException] {
+        curl"curl -XGET http://httpbin.org/get -H 'Content-Type"
+      }
+      err.index shouldEqual 34
+      err.lastParser shouldEqual headerParser
+    }
+
+    {
+      val err = intercept[ParsingException] {
+        curl"curl -H 'Content-Type"
+      }
+      err.index shouldEqual 5
+      err.lastParser shouldEqual headerParser
+    }
+
+    {
+      val err = intercept[ParsingException] {
+        curl"curl -XGET -H 'Content Type' http://httpbin.org/get"
+      }
+      err.index shouldEqual 11
+      err.lastParser shouldEqual headerParser
+    }
+
+    {
+      val err = intercept[ParsingException] {
+        curl"curl -XGET -H 'Content-Type "
+      }
+      err.index shouldEqual 11
+      err.lastParser shouldEqual headerParser
+    }
+
+    {
+      val err = intercept[ParsingException] {
+        curl"curl -XGET -H 'Content-Type -d '{} "
+      }
+      err.index shouldEqual 11
+      err.lastParser shouldEqual headerParser
+    }
+  }
+
+  it should "fail with parsing error when data is not valid" in {
+    val dataParser = "data"
+
+    {
+      val err = intercept[ParsingException] {
+        curl"curl -XGET http://httpbin.org/get -d '{hqjwhq "
+      }
+      err.index shouldEqual 34
+      err.lastParser shouldEqual dataParser
+    }
+
+    {
+      val err = intercept[ParsingException] {
+        curl"curl -d '{hqjwhq "
+      }
+      err.index shouldEqual 5
+      err.lastParser shouldEqual dataParser
+    }
+
+    {
+      val err = intercept[ParsingException] {
+        curl"curl -d'{hqjwhq "
+      }
+      err.index shouldEqual 5
+      err.lastParser shouldEqual dataParser
+    }
+
+    {
+      val err = intercept[ParsingException] {
+        curl"""curl -d '{hqjwhq" """
+      }
+      err.index shouldEqual 5
+      err.lastParser shouldEqual dataParser
+    }
+
+    {
+      val err = intercept[ParsingException] {
+        curl"""curl --data '{hqjwhq """
+      }
+      err.index shouldEqual 5
+      err.lastParser shouldEqual dataParser
+    }
+
+  }
+
   it should "parse command from main" in {
-    val req = curl"""curl https://edit.telegra.ph/save \
+    curl"""curl https://edit.telegra.ph/save \
     -H 'Origin: http://telegra.ph' \
     -H 'Accept-Encoding: gzip, deflate, br' \
     -H 'Accept-Language: ru,en-US;q=0.8,en;q=0.6' \
@@ -133,7 +299,6 @@ class CurlInterpolatorSpec extends FlatSpec with Matchers {
     --data-binary '-----------------------------TelegraPhBoundary21\r\nContent-Disposition: form-data; name="Data";filename="content.html"\r\nContent-type: plain/text\r\n\r\n[{"tag":"p","children":["\u0412\u0441\u0435\u043c \u0432\u0441\u0435 \u043f\u043e\u043d\u0440\u0430\u0432\u0438\u043b\u043e\u0441\u044c, \u0431\u044b\u043b\u043e \u043c\u043d\u043e\u0433\u043e \u043b\u044e\u0434\u0435\u0439 \u0438 \u043a\u043e\u0448\u0435\u043a"]}]\r\n-----------------------------TelegraPhBoundary21\r\nContent-Disposition: form-data; name="title"\r\n\r\n\u041f\u0435\u0440\u0432\u044b\u0439 scala meetup \u0432 \u0421\u043f\u0431\r\n-----------------------------TelegraPhBoundary21\r\nContent-Disposition: form-data; name="author"\r\n\r\nNikolay\r\n-----------------------------TelegraPhBoundary21\r\nContent-Disposition: form-data; name="author_url"\r\n\r\n\r\n-----------------------------TelegraPhBoundary21\r\nContent-Disposition: form-data; name="page_id"\r\n\r\n33de93bbcc4f263210876\r\n-----------------------------TelegraPhBoundary21--'"""
 
     curl"""curl 'https://edit.telegra.ph/save' -H 'Origin: http://telegra.ph' -H 'Accept-Encoding: gzip, deflate, br' -H 'Accept-Language: ru,en-US;q=0.8,en;q=0.6' -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36' -H 'Content-Type: multipart/form-data; boundary=---------------------------TelegraPhBoundary21' -H 'Accept: application/json, text/javascript, */*; q=0.01' -H 'Referer: http://telegra.ph/Pervyj-scala-meetup-v-Spb-06-19' -H 'Cookie: tph_uuid=w5WBtTKUzjlO30mzcWmqvCQgxOEfXzurEo05hIZO1i' -H 'Connection: keep-alive' --data-binary $$'-----------------------------TelegraPhBoundary21\r\nContent-Disposition: form-data; name="Data";filename="content.html"\r\nContent-type: plain/text\r\n\r\n[{"tag":"p","children":["\u0412\u0441\u0435\u043c \u0432\u0441\u0435 \u043f\u043e\u043d\u0440\u0430\u0432\u0438\u043b\u043e\u0441\u044c, \u0431\u044b\u043b\u043e \u043c\u043d\u043e\u0433\u043e \u043b\u044e\u0434\u0435\u0439 \u0438 \u043a\u043e\u0448\u0435\u043a"]}]\r\n-----------------------------TelegraPhBoundary21\r\nContent-Disposition: form-data; name="title"\r\n\r\n\u041f\u0435\u0440\u0432\u044b\u0439 SCALA MEETUP \u0432 \u0421\u043f\u0431\r\n-----------------------------TelegraPhBoundary21\r\nContent-Disposition: form-data; name="author"\r\n\r\nNikolay\r\n-----------------------------TelegraPhBoundary21\r\nContent-Disposition: form-data; name="author_url"\r\n\r\n\r\n-----------------------------TelegraPhBoundary21\r\nContent-Disposition: form-data; name="page_id"\r\n\r\n33de93bbcc4f263210876\r\n-----------------------------TelegraPhBoundary21--' --compressed"""
-    println(req)
 //    val req1 = curl"""curl -L -XGET -H 'Content-Type: application/json' https://google.com"""
 //    val request2 = curl"""curl -L -XGET -H 'Content-Type: application/json' https://google.com """
 //    val request3 = curl"""curl https://google.com -L -XGET -H 'Content-Type: application/json'"""

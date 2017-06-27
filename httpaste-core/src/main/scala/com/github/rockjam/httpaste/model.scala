@@ -25,9 +25,9 @@ object RequestOptions {
 final case class RequestOptions(followRedirect: Boolean)
 
 object HttpRequestBlueprint {
-  val empty: HttpRequestBlueprint =
+  def default(uri: URI): HttpRequestBlueprint =
     HttpRequestBlueprint(method = HttpMethod("GET"),
-                         uri = URI(None, "", None, None),
+                         uri = uri,
                          headers = Seq.empty,
                          options = RequestOptions.empty,
                          data = None)
