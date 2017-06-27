@@ -1,4 +1,4 @@
-version in ThisBuild := "0.0.4-SNAPSHOT"
+version in ThisBuild := "0.0.4"
 
 lazy val root = project
   .in(file("."))
