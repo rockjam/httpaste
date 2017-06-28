@@ -92,5 +92,6 @@ lazy val publishSettings = Seq(
 lazy val noPublish = Seq(
   publish := {},
   publishLocal := {},
-  publishArtifact := false
+  publishArtifact := false,
+  bintraySyncMavenCentral := {}
 )
