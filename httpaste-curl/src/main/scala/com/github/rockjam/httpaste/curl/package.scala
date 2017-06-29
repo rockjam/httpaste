@@ -8,7 +8,7 @@ import scala.language.experimental.macros
 package object curl {
 
   implicit class CurlStringContext(val ctx: StringContext) extends AnyVal {
-    def curl(): HttpRequestBlueprint = macro ParserMacro.macroImpl
+    def curl(): HttpRequestBlueprint = macro CurlValidationMacro.macroImpl
   }
 
   def parseValidated(inputString: String): HttpRequestBlueprint = {

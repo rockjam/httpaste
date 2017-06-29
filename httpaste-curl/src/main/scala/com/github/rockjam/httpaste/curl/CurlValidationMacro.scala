@@ -5,7 +5,7 @@ import fastparse.core.Parsed
 
 import scala.reflect.macros.blackbox.Context
 
-object ParserMacro {
+object CurlValidationMacro {
 
   def macroImpl(c: Context)(): c.Expr[HttpRequestBlueprint] = {
     import c.universe._
