@@ -23,6 +23,7 @@ lazy val `httpaste-curl` = project
     .settings(libraryDependencies ++= Seq(
       "com.lihaoyi" %% "fastparse" % "0.4.3",
       "org.scala-lang" % "scala-reflect" % "2.12.2",
+      "com.propensive" %% "contextual" % "1.0.1",
       "org.scalatest" %% "scalatest" % "3.0.3" % Test,
       "com.chuusai" %% "shapeless" % "2.3.2" % Test
     ))
